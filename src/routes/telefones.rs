@@ -1,5 +1,6 @@
 use actix_web::{web, HttpResponse};
 use sqlx::PgPool;
+use serde_json::json;
 
 use chrono::Utc;
 use uuid::Uuid;
@@ -27,7 +28,14 @@ pub async fn create_telefone(
     .execute(pool.get_ref())
     .await
     {
-        Ok(_) => HttpResponse::Ok().finish(),
+        Ok(_) => {
+            let response = json!({
+                "message": "Denuncia registrada com sucesso!"
+            });
+            HttpResponse::Created()
+                .content_type("application/json")
+                .json(response)
+        },
         Err(e) => {
             println!("Failed to execute query: {}", e);
             HttpResponse::InternalServerError().finish()
